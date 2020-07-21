@@ -10,12 +10,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # Create a Migrate instance & link to our Flask App & SQLAlchemy DB
 migrate = Migrate(app, db)
-
+# Child
 class Todo(db.Model):
     __tablename__ = 'todos'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
+    # Child's Foreign Key
+    list_id = db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
 
     # Debugging Messages
     def __repr__(self):
@@ -23,6 +25,14 @@ class Todo(db.Model):
 
 # Removed to use Migrate instead
 #db.create_all()
+
+# Parent ToDO List
+class TodoList(db.Model):
+    __tablename__ = 'todolists'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    # One-to-Many Relationship with Todo 'todos table'
+    todos = db.relationship('Todo', backref='list', lazy=True)
 
 ## Adding ToDo items
 @app.route('/todos/create', methods=['POST'])
