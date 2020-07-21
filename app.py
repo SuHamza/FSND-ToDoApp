@@ -62,7 +62,16 @@ def set_completed_todo(todo_id):
         db.session.close()
     return redirect(url_for('index'))
 
-
+@app.route('/todos/<del_id>/deleted', methods=['DELETE'])
+def delete_todo(del_id):
+    try:
+        Todo.query.filter_by(id=del_id).delete()
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return jsonify({ 'success': True })
 
 @app.route('/')
 ## The Controller

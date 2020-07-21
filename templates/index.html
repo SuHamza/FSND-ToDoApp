@@ -15,6 +15,19 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            width: 300px;
+        }
+
+        li {
+            clear: both;
+        }
+
+        li button {
+            border: none;
+            color: red;
+            float: right;
+            cursor: pointer;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -29,11 +42,35 @@
         {% for d in data %}
         <li>
             <input type="checkbox" class="check-completed" data-id="{{ d.id }}" {% if d.completed %} checked {% endif %}> {{ d.description }}
+            <button class="delete-btn" data-id="{{ d.id }}">&cross;</button>
         </li>
         {% endfor %}
     </ul>
 
     <script>
+        /* Send (DELETE) Requests when Delete Btn. clicked*/
+        const deleteBtns = document.querySelectorAll('.delete-btn');
+        for (const btn of deleteBtns) {
+            btn.onclick = function (e) {
+                const delID = e.target.dataset['id'];
+                fetch('/todos/' + delID + '/deleted', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(function () {
+                        const item = e.target.parentElement;
+                        item.remove();
+                        /* Remove Error Msg. */
+                        document.getElementById('error').className = 'hidden';
+                    })
+                    .catch(function () {
+                        document.getElementById('error').className = '';
+                    })
+
+            }
+        }
         /* Send Update (POST) Requests from CheckBoxes*/
         const checkboxes = document.querySelectorAll('.check-completed');
         for (let i = 0; i < checkboxes.length; i++) {
